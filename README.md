@@ -6,6 +6,7 @@
 script by Troy Collin
 
 This script will create new clients and setup API Key
+
 Script will ask for info like client name that will be used
 
 v.1.0
