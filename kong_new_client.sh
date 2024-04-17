@@ -32,7 +32,7 @@ curl -X POST --url "http://localhost:8001/consumers/$consumer_data/key-auth/"
 
 # display API key
 key=$(curl -X GET --url "http://localhost:8001/consumers/$consumer_data/key-auth/")
-key1=$(echo "$key" | cut -d'"' -f 14)
+key1=$(echo "$key" | cut -d'"' -f 10)
 
 echo ""
 echo "Here is the API Key"
