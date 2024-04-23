@@ -74,3 +74,19 @@ read -p "Enter the name of the consumer: " consumer_name2
 # display API key
 key=$(curl -X GET --url "http://localhost:8001/consumers/$consumer_data2/key-auth/")
 key1=$(echo "$key" | cut -d'"' -f 10)
+bash ./kong_new_client.sh
+;;
+
+
+
+
+"z"|"Z")
+exit
+;;
+
+*)
+echo "invalid answer, please try again"
+;;
+
+esac
+done
