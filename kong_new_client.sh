@@ -67,14 +67,16 @@ bash ./kong_new_client.sh
 ;;
 "c"|"C")
 read -p "Enter the name of the consumer: " consumer_name1
-curl -X POST "http://127.0.0.1:8001/consumers/$consumer_data1/acls" --data "group=Prod-AccessGroup"
+curl -X POST "http://127.0.0.1:8001/consumers/$consumer_name1/acls" --data "group=Prod-AccessGroup"
+read -n 1 -s -r -p "Press any key to continue"
 bash ./kong_new_client.sh
 ;;
 "d"|"D")
 read -p "Enter the name of the consumer: " consumer_name2
 # display API key
-key=$(curl -X GET --url "http://localhost:8001/consumers/$consumer_data2/key-auth/")
+key=$(curl -X GET --url "http://localhost:8001/consumers/$consumer_name2/key-auth/")
 key1=$(echo "$key" | cut -d'"' -f 10)
+read -n 1 -s -r -p "Press any key to continue"
 bash ./kong_new_client.sh
 ;;
 
