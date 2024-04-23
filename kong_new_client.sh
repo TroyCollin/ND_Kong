@@ -61,7 +61,7 @@ bash ./kong_new_client.sh
 ;;
 "b"|"B")
 
-curl -X POST "http://127.0.0.1:8001/consumers/" | jq | grep "username"
+curl -X GET "http://127.0.0.1:8001/consumers/" | jq | grep "username"
 read -n 1 -s -r -p "Press any key to continue"
 bash ./kong_new_client.sh
 ;;
