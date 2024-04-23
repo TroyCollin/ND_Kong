@@ -16,6 +16,20 @@ echo " Script will ask for info like client name that will be used"
 echo ""
 echo "v.1.0"
 
+
+while :
+do
+echo "Main Menu:"
+echo -e "\t(a) Create New API Customer"
+echo -e "\t(b) List Current Usernames"
+echo -e "\t(c) Add user to Prod Access Group ( Assets / Orders)"
+echo -e "\t(d) Display API Key"
+
+echo -e "\t(z) Exit"
+echo -n "Please enter your choice:"
+read choice
+case $choice in
+"a"|"A")
 read -p "Enter the name of the consumer: " consumer_name
 read -p "Enter the code for this consumer: " consumer_id
 
@@ -43,5 +57,20 @@ echo "   $key1"
 echo " *                                        *"
 echo " ******************************************"
 echo ""
+bash ./kong_new_client.sh
+;;
+"b"|"B")
 
-
+curl -X POST "http://127.0.0.1:8001/consumers/" | jq | grep "username"
+bash ./kong_new_client.sh
+;;
+"c"|"C")
+read -p "Enter the name of the consumer: " consumer_name1
+curl -X POST "http://127.0.0.1:8001/consumers/$consumer_data1/acls" --data "group=Prod-AccessGroup"
+bash ./kong_new_client.sh
+;;
+"d"|"D")
+read -p "Enter the name of the consumer: " consumer_name2
+# display API key
+key=$(curl -X GET --url "http://localhost:8001/consumers/$consumer_data2/key-auth/")
+key1=$(echo "$key" | cut -d'"' -f 10)
