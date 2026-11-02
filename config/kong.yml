@@ -1,0 +1,10 @@
+_format_version: "3.0"
+
+services:
+  - name: mock-service
+    url: http://httpbin.org
+    routes:
+      - name: mock-route
+        paths:
+          - /anything
+
