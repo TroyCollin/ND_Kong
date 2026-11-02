@@ -1,6 +1,6 @@
 # Next Dimension Inc. — Kong Local Test Environment Setup Guide
 
-This document explains how to stand up a local, containerized **Kong API Gateway** test environment using Docker Compose. This environment mirrors the structure targeted by your Kong consumer management bash script.
+This document explains how to stand up a local, containerized **Kong API Gateway** test environment using Docker Compose and configure the necessary runtime plugins (`key-auth` and `acl`) required by your consumer management script.
 
 ---
 
@@ -37,7 +37,7 @@ The `docker-compose.yml` file provisions a microservice topology inside a dedica
 *   **Lifecycle**: Auto-terminates with exit code `0` immediately after establishing database table schemas.
 
 ### 3. Core Kong Gateway (`kong`)
-*   **Role**: Processes traffic proxies, hooks into runtime plugins (`acl`, `key-auth`), and tracks active operational state.
+*   **Role**: Processes traffic proxies, hooks into runtime plugins, and tracks active operational state.
 *   **Mapped Infrastructure Ports**:
     *   `8000`: Standard HTTP traffic proxy gateway entry point.
     *   `8001`: Local loopback Admin API endpoint (Targeted directly by your management bash script).
@@ -65,11 +65,39 @@ docker compose logs -f
 
 ---
 
-## 5. Verifying the Test Environment
+## 5. Global Plugin Activation
+
+Before your consumer script can restrict traffic or validate keys, you must activate the corresponding security plugins on the Kong cluster. Run these commands from your host machine terminal once the containers are running.
+
+### 1. Enable Key Authentication (`key-auth`)
+This plugin intercepts incoming proxy requests and ensures they pass a valid credential string via your chosen headers or query parameters (defaults to checking for a `apikey` header parameter).
+
+To enable it globally across all routes:
+```bash
+curl -X POST http://localhost:8001/plugins \
+  --data "name=key-auth" \
+  --data "config.key_names=apikey"
+```
+
+### 2. Enable Access Control Lists (`acl`)
+The ACL plugin works alongside `key-auth`. Once a consumer's identity is verified by their API Key, this plugin checks if their assigned group string matches your allowed routing rules.
+
+To enable it globally across all routes:
+```bash
+curl -X POST http://localhost:8001/plugins \
+  --data "name=acl" \
+  --data "config.allow=Prod-AccessGroup" \
+  --data "config.hide_groups_header=true"
+```
+*Note: Using `config.allow` ensures that only clients belonging to the specified group (which your script attaches during option A or C) can successfully proxy past the gateway layer.*
+
+---
+
+## 6. Verifying the Test Environment
 
 Once everything is up, you can verify your runtime boundaries locally before running your administration shell script:
 
-1.  **Kong Manager Web UI**: Open your preferred browser and navigate to [http://localhost:8002](http://localhost:8002) to view the graphical cluster dashboard.
+1.  **Kong Manager Web UI**: Open your preferred browser and navigate to [http://localhost:8002](http://localhost:8002) to view the graphical cluster dashboard and confirm both plugins are active under the "Plugins" menu.
 2.  **Admin API Loopback**: Query the status endpoint to verify communication capability:
     ```bash
     curl -i http://localhost:8001/status
@@ -78,7 +106,7 @@ Once everything is up, you can verify your runtime boundaries locally before run
 
 ---
 
-## 6. Tearing Down the Infrastructure
+## 7. Tearing Down the Infrastructure
 
 To stop the containers without destroying database configurations:
 ```bash
@@ -89,3 +117,4 @@ To wipe the workspace completely—including all created consumers, keys, and AP
 ```bash
 docker compose down -v
 ```
+
